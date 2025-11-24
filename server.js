@@ -17,7 +17,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 // =============================
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = 'mongodb+srv://admin:admin@cluster0.lnqtbw7.mongodb.net/?appName=Cluster0';
 const SESSION_SECRET = process.env.SESSION_SECRET;
 
 mongoose.connect(MONGODB_URI)
