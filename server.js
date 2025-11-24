@@ -61,7 +61,7 @@ app.use(passport.session());
 passport.use(new GoogleStrategy({
   clientID: GOOGLE_CLIENT_ID,
   clientSecret: GOOGLE_CLIENT_SECRET,
-  callbackURL: 'https://comp3810-group62.onrender.com/auth/google/callback'
+  callbackURL: 'https://comp3810sef-group62.onrender.com/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ googleId: profile.id });
