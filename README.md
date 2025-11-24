@@ -11,8 +11,8 @@
 - package.json: List all dependencies used in the project, including: express, mongoose, passport, bcrypt, connect-mongo, ejs.
 - views/: EJS template files for rendering UI, including: login.ejs for login page, register.ejs for registration page, calendar.ejs for main calendar interface.
 
-## Operation Guide
-# Login/Logout Flow
+# Operation Guide
+## Login/Logout Flow
 1.  Users can choose:
     - Google Login: /auth/google
     - Username/Password Login: /login
@@ -20,14 +20,14 @@
 3. After successful login, users are redirected to /calendar
 4. Logout via /logout
 
-## Web-Based CRUD Flow
+# Web-Based CRUD Flow
 On the  page:
 • 	Create: Click “Add Event” to open a form and create a new event
 •   Read: Events are automatically loaded and displayed on the calendar 
 • 	Update: Click an existing event to edit its title, date, or description
 • 	Delete: Click “Delete” to remove an event
 
-## RESTful API Guide
+# RESTful API Guide
 | Function     | Method | URL               | Description              |
 |--------------|--------|-------------------|--------------------------|
 | Get Events   | GET    | /api/events       | Returns all user events  |
@@ -35,20 +35,20 @@ On the  page:
 | Update Event | PUT    | /api/events/:id   | Updates event            |
 | Delete Event | DELETE | /api/events/:id   | Deletes event            |
 
-## API Testing with curl
+# API Testing with curl
 
-# Step 1: Register a test account
+## Step 1: Register a test account
 curl -X POST http://localhost:3000/register \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=test&password=testtest"
 
-# Step 2: Log in and store session cookie
+## Step 2: Log in and store session cookie
 curl -c cookie.txt -X POST http://localhost:3000/login \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -H "Accept: application/json" \
   -d "username=test&password=testtest"
 
-# Step 3: Send authenticated request to create an event
+## Step 3: Send authenticated request to create an event
 - Create an event
 curl -b cookie.txt -X POST http://localhost:3000/api/events \
   -H "Content-Type: application/json" \
