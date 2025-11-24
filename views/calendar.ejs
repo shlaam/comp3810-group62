@@ -1,0 +1,202 @@
+<%- include('partials/header') %>
+
+<div id="calendar"></div>
+
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Add Event</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="eventId">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Title <span class="text-danger">*</span></label>
+          <input type="text" id="title" class="form-control" placeholder="Enter event name">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Date <span class="text-danger">*</span></label>
+          <input type="date" id="date" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Description (optional)</label>
+          <textarea id="description" class="form-control" rows="4" placeholder="Enter notes..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger" id="deleteBtn" style="display:none;">
+          Delete Event
+        </button>
+        <button type="button" class="btn btn-primary" id="saveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const calendarEl = document.getElementById('calendar');
+    const modal = new bootstrap.Modal('#eventModal');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'en',
+      height: 'auto',
+      headerToolbar: { left: 'prev today next', center: 'title', right: '' },
+      buttonText: { today: 'Today' },
+      displayEventTime: false,
+      eventDisplay: 'block',
+      dayMaxEvents: true,
+      eventClick: function(info) {
+        document.querySelector('.modal-title').textContent = 'Edit Event';
+        document.getElementById('eventId').value = info.event.id;
+        document.getElementById('title').value = info.event.title;
+        document.getElementById('date').value = info.event.startStr.substring(0, 10);
+        document.getElementById('description').value = info.event.extendedProps.description || '';
+        document.getElementById('deleteBtn').style.display = 'block';
+        modal.show();
+      },
+      dateClick: function(info) {
+        document.querySelector('.modal-title').textContent = 'Add Event';
+        document.getElementById('eventId').value = '';
+        document.getElementById('title').value = '';
+        document.getElementById('date').value = info.dateStr;
+        document.getElementById('description').value = '';
+        document.getElementById('deleteBtn').style.display = 'none';
+        modal.show();
+      },
+      events: '/api/events'
+    });
+    calendar.render();
+
+    // Save
+    document.getElementById('saveBtn').onclick = async () => {
+      const id = document.getElementById('eventId').value;
+      const title = document.getElementById('title').value.trim();
+      const date = document.getElementById('date').value;
+      const description = document.getElementById('description').value.trim();
+      if (!title || !date) return alert('Title and date cannot be empty!');
+
+      const payload = { title, date, description };
+      try {
+        if (id) {
+          await fetch(`/api/events/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        } else {
+          await fetch('/api/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        }
+        modal.hide();
+        calendar.refetchEvents();
+      } catch (e) { alert('儲存失敗'); }
+    };
+
+    // Delete
+    document.getElementById('deleteBtn').onclick = async () => {
+      if (!confirm('Are you sure you want to permanently delete this event?')) return;
+      const id = document.getElementById('eventId').value;
+      await fetch(`/api/events/${id}`, { method: 'DELETE' });
+      modal.hide();
+      calendar.refetchEvents();
+    };
+  });
+</script>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364) !important;
+    min-height: 100vh;
+  }
+
+  #calendar {
+    max-width: 1100px;
+    margin: 40px auto;
+    background: rgba(255, 255, 255, 0.09) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 30px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  }
+
+  .fc { color: #e8f0fe; }
+  .fc-theme-standard td, .fc-theme-standard th { border-color: rgba(255,255,255,0.12); }
+  .fc-col-header-cell { background: rgba(255,255,255,0.06); }
+  .fc-daygrid-day-number { color: #ccc; }
+  .fc-day-today { background: rgba(100, 180, 255, 0.25) !important; }
+  .fc-button-primary {
+    background: rgba(255,255,255,0.15) !important;
+    border: 1px solid rgba(255,255,255,0.3) !important;
+    color: white !important;
+  }
+  .fc-button-primary:hover { background: rgba(255,255,255,0.25) !important; }
+  .fc-event {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 3px 8px !important;
+    font-weight: 500;
+  }
+
+  .modal-content {
+    background: rgba(20, 35, 45, 0.95);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+  }
+  .modal-header { border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .form-control, .form-control:focus {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+  }
+  .form-control::placeholder { color: #aaa; }
+  
+  
+
+.modal-header {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); !important;  
+  border-bottom: none !important;
+}
+
+
+.modal-title {
+  font-weight: 600;
+  color: white !important;
+  letter-spacing: 0.5px;
+}
+
+.btn-close-white {
+  filter: brightness(0) invert(1);
+}
+
+
+#saveBtn {
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); !important;  
+  border: none !important;
+  border-radius: 14px !important;
+  padding: 12px 36px !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  color: white !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+#saveBtn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 28px rgba(139, 92, 246, 0.5) !important;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); !important;
+}
+
+#saveBtn:active {
+  transform: translateY(-1px) !important;
+}
+</style>
+
+</body>
+</html>
