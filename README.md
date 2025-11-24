@@ -45,13 +45,21 @@ curl -c cookie.txt -X POST https://comp3810sef-group62.onrender.com/login -H "Co
 
 ## Step 3: Send authenticated request to create an event
 Create an event
+```
 curl -b cookie.txt -X POST https://comp3810sef-group62.onrender.com/api/events -H "Content-Type: application/json" -d "{\"title\":\"Meeting\",\"date\":\"2025-11-25\",\"description\":\"Team sync\"}"
+```
 
 Read all events
+```
 curl -b cookie.txt -X GET https://comp3810sef-group62.onrender.com/api/events
+```
 
 Update an event
+```
 curl -b cookie.txt -X PUT https://comp3810sef-group62.onrender.com/api/events/69240ddbd5d5c1df15abba12 -H "Content-Type: application/json" -d "{\"title\":\"Updated Meeting\",\"date\":\"2025-11-26\",\"description\":\"Updated team sync\"}"
+```
 
 Delete an event
+```
 curl -b cookie.txt -X DELETE https://comp3810sef-group62.onrender.com/api/events/<event_id>
+```
